@@ -1,86 +1,80 @@
 package com.unava.dia.weatherapp.presentation.ui.day
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberImagePainter
 import com.unava.dia.weatherapp.R
-import com.unava.dia.weatherapp.presentation.ui.theme.WeatherAppTheme
+import com.unava.dia.weatherapp.data.model.current.CurrentWeatherResponse
+import com.unava.dia.weatherapp.presentation.ui.theme.Black
+import com.unava.dia.weatherapp.presentation.ui.theme.ColorPrimaryDark
+import com.unava.dia.weatherapp.presentation.ui.theme.Grey
 
 @Composable
 fun DayScreen(
     viewModel: DayViewModel = viewModel(),
     navigateToMonth: (String) -> Unit,
 ) {
+    val state by viewModel.state.collectAsState()
+    when (state) {
+        is State.START -> {
+
+        }
+        is State.LOADING -> {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator()
+            }
+        }
+        is State.FAILURE -> {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                Text(text = "Something went wrong...", fontSize = 16.sp)
+            }
+        }
+        is State.SUCCESS -> {
+            val weather = (state as State.SUCCESS).weather
+            Day(weather, viewModel)
+        }
+    }
+}
+
+@Composable
+fun Day(weather: CurrentWeatherResponse, viewModel: DayViewModel) {
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier.fillMaxSize()
     ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             LabelCity()
-            EditTextCity()
+            EditTextCity(viewModel)
             Spacer(modifier = Modifier.width(16.dp))
-            ButtonOk()
+            Row(horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically) {
+                ButtonOk(viewModel)
+            }
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            WeatherImage()
+            WeatherImage("https:" + weather.current!!.condition!!.icon!!)
             Spacer(modifier = Modifier.height(16.dp))
-            LabelCityName()
+            LabelCityName(weather.location?.name ?: "London")
             Spacer(modifier = Modifier.height(16.dp))
-            LabelTemp()
+            LabelTemp(weather.current?.feelslike_c.toString())
             Spacer(modifier = Modifier.height(16.dp))
-            LabelF()
-        }
-    }
-}
-
-@Preview
-@Composable
-fun DefaultPreview() {
-    WeatherAppTheme {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                LabelCity()
-                EditTextCity()
-                ButtonOk()
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                WeatherImage()
-                Spacer(modifier = Modifier.height(16.dp))
-                LabelCityName()
-                Spacer(modifier = Modifier.height(16.dp))
-                LabelTemp()
-                Spacer(modifier = Modifier.height(16.dp))
-                LabelF()
-            }
+            LabelWeather(weather.current?.condition?.text.toString())
         }
     }
 }
@@ -89,23 +83,20 @@ fun DefaultPreview() {
 fun LabelCity() {
     Text(
         text = "City",
-        color = MaterialTheme.colors.secondaryVariant,
+        modifier = Modifier.padding(26.dp, 26.dp, 8.dp, 8.dp),
+        color = Black,
         style = MaterialTheme.typography.button
     )
 }
 
 @Composable
-fun EditTextCity() {
-    var cityFieldState by remember {
-        mutableStateOf("")
-    }
-
+fun EditTextCity(viewModel: DayViewModel) {
     OutlinedTextField(
         modifier = Modifier
-            .padding(30.dp),
-        value = cityFieldState,
+            .padding(8.dp, 26.dp, 8.dp, 8.dp),
+        value = viewModel.city,
         onValueChange = {
-            cityFieldState = it
+            viewModel.city = it
         },
         shape = RoundedCornerShape(8.dp),
     )
@@ -113,53 +104,64 @@ fun EditTextCity() {
 }
 
 @Composable
-fun ButtonOk() {
+fun ButtonOk(viewModel: DayViewModel) {
     TextButton(
-        onClick = { /*TODO*/ },
-        modifier = Modifier.padding(8.dp)
+        onClick = {
+            viewModel.saveCity()
+            viewModel.fetchWeather()
+        },
+        modifier = Modifier.padding(8.dp, 26.dp, 26.dp, 8.dp)
     ) {
         Text(text = "OK")
     }
 }
 
 @Composable
-fun WeatherImage() {
+fun WeatherImage(imgUrl: String) {
+    val painter = rememberImagePainter(
+        data = imgUrl,
+        builder = {
+            placeholder(R.drawable.weather)
+            crossfade(true)
+        }
+    )
+
     Image(
-        painter = painterResource(R.drawable.weather),
+        painter = painter,
         contentDescription = null,
         modifier = Modifier
             .size(40.dp)
-            .clip(CircleShape)
-            .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
     )
 
 }
 
 @Composable
-fun LabelCityName() {
+fun LabelCityName(city: String) {
     Text(
-        text = "London",
-        color = MaterialTheme.colors.secondaryVariant,
-        style = MaterialTheme.typography.h3
-    )
-
-}
-
-@Composable
-fun LabelTemp() {
-    Text(
-        text = "10°C",
-        color = MaterialTheme.colors.secondaryVariant,
+        text = city,
+        modifier = Modifier.padding(5.dp),
+        color = Black,
         style = MaterialTheme.typography.h4
     )
+
 }
 
 @Composable
-fun LabelF() {
+fun LabelTemp(temp: String) {
     Text(
-        text = "rain",
-        color = MaterialTheme.colors.secondaryVariant,
+        text = "$temp°C",
+        color = ColorPrimaryDark,
+        modifier = Modifier.padding(5.dp),
         style = MaterialTheme.typography.h5
+    )
+}
+
+@Composable
+fun LabelWeather(weather: String) {
+    Text(
+        text = weather,
+        color = Grey,
+        style = MaterialTheme.typography.h6
     )
 
 }
