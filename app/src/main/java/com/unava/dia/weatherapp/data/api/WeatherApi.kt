@@ -23,5 +23,5 @@ interface WeatherApi {
     suspend fun getFutureWeatherAsync(
         @Query("q") location: String,
         @Query("days") days: Int,
-    ): Flow<FutureWeatherResponse>
+    ): FutureWeatherResponse
 }

@@ -22,7 +22,8 @@ import com.unava.dia.weatherapp.presentation.ui.theme.Grey
 @Composable
 fun DayScreen(
     viewModel: DayViewModel = viewModel(),
-    navigateToMonth: (String) -> Unit,
+    //onBackPressed: () -> Unit
+    //navigateToMonth: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     when (state) {
@@ -50,7 +51,9 @@ fun DayScreen(
 fun Day(weather: CurrentWeatherResponse, viewModel: DayViewModel) {
     Column(
         verticalArrangement = Arrangement.Top,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(0.dp, 46.dp, 0.dp, 0.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically

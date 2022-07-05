@@ -23,5 +23,5 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideGetFutureWeatherUseCase(api: WeatherApi) = GetFutureWeatherUseCase()
+    fun provideGetFutureWeatherUseCase(api: WeatherApi) = GetFutureWeatherUseCase(api)
 }
