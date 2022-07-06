@@ -4,54 +4,74 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.unava.dia.weatherapp.presentation.ui.day.DayScreen
 import com.unava.dia.weatherapp.presentation.ui.month.MonthScreen
+import com.unava.dia.weatherapp.presentation.ui.theme.ColorAccent
+import com.unava.dia.weatherapp.presentation.ui.theme.ColorPrimaryDark
 import kotlinx.coroutines.launch
 
 
 @ExperimentalPagerApi
 @Composable
 fun WeatherApp() {
-    val pagerState = rememberPagerState(pageCount = 2)
-    val tabs = listOf("CURRENT", "FUTURE")
-    val tabIndex = pagerState.currentPage
-    val coroutineScope = rememberCoroutineScope()
-    // TAB
-    TabRow(selectedTabIndex = tabIndex,
-        modifier = Modifier.padding(top = 20.dp)) {
-        tabs.forEachIndexed { index, text ->
-            Tab(selected = tabIndex == index, onClick = {
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(index)
-                }
-            }, text = { Text(text = text) })
-        }
-    }
+    Surface(modifier = Modifier.fillMaxSize()) {
+        val pagerState = rememberPagerState()
+        val tabs = listOf("CURRENT", "FORECAST")
+        var state by remember { mutableStateOf(0) }
+        val scope = rememberCoroutineScope()
 
-    // PAGER
-    HorizontalPager(
-        state = pagerState
-    ) { index ->
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when (index) {
-                0 -> DayScreen(viewModel = hiltViewModel())
-                1 -> MonthScreen(viewModel = hiltViewModel())
+        // TAB
+        Column(Modifier.padding(top = 24.dp)) {
+            TabRow(selectedTabIndex = state,
+                indicator = {
+                    TabRowDefaults.Indicator(
+                        Modifier.pagerTabIndicatorOffset(pagerState, it)
+                    )
+                },
+            ) {
+                tabs.forEachIndexed { index, text ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        },
+                        text = {
+                            Text(
+                                text = text,
+                                color = if (pagerState.currentPage == index) ColorPrimaryDark else ColorAccent
+                            )
+                        }
+                    )
+                }
+            }
+
+            // PAGER
+            HorizontalPager(
+                count = tabs.size,
+                state = pagerState,
+            ) { index ->
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    when (index) {
+                        0 -> DayScreen(viewModel = hiltViewModel())
+                        1 -> MonthScreen(viewModel = hiltViewModel())
+                    }
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.unava.dia.weatherapp.presentation.ui.day
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -16,6 +17,7 @@ import coil.compose.rememberImagePainter
 import com.unava.dia.weatherapp.R
 import com.unava.dia.weatherapp.data.model.current.CurrentWeatherResponse
 import com.unava.dia.weatherapp.presentation.ui.theme.Black
+import com.unava.dia.weatherapp.presentation.ui.theme.ColorPrimary
 import com.unava.dia.weatherapp.presentation.ui.theme.ColorPrimaryDark
 import com.unava.dia.weatherapp.presentation.ui.theme.Grey
 
@@ -39,6 +41,8 @@ fun DayScreen(
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                 Text(text = "Something went wrong...", fontSize = 16.sp)
             }
+            viewModel.city = "London"
+            viewModel.saveCity()
         }
         is State.SUCCESS -> {
             val weather = (state as State.SUCCESS).weather
@@ -53,18 +57,14 @@ fun Day(weather: CurrentWeatherResponse, viewModel: DayViewModel) {
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
             .fillMaxSize()
-            .padding(0.dp, 46.dp, 0.dp, 0.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             LabelCity()
             EditTextCity(viewModel)
-            Spacer(modifier = Modifier.width(16.dp))
-            Row(horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically) {
-                ButtonOk(viewModel)
-            }
+            Spacer(modifier = Modifier.width(120.dp))
+            ButtonOk(viewModel)
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -108,14 +108,19 @@ fun EditTextCity(viewModel: DayViewModel) {
 
 @Composable
 fun ButtonOk(viewModel: DayViewModel) {
-    TextButton(
-        onClick = {
-            viewModel.saveCity()
-            viewModel.fetchWeather()
-        },
-        modifier = Modifier.padding(8.dp, 26.dp, 26.dp, 8.dp)
-    ) {
-        Text(text = "OK")
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = {
+                viewModel.saveCity()
+                viewModel.fetchWeather()
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(26.dp, 26.dp),
+            elevation = ButtonDefaults.elevation(10.dp)
+        ) {
+            Text(text = "OK")
+        }
     }
 }
 
