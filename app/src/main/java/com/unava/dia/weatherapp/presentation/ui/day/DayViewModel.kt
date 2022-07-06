@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unava.dia.weatherapp.data.local.PrefsHelper
+import com.unava.dia.weatherapp.data.local.prefs.PrefsHelper
 import com.unava.dia.weatherapp.domain.usecase.GetCurrentWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

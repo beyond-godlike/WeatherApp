@@ -3,7 +3,7 @@ package com.unava.dia.weatherapp.presentation.ui.month
 import android.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unava.dia.weatherapp.data.local.PrefsHelper
+import com.unava.dia.weatherapp.data.local.prefs.PrefsHelper
 import com.unava.dia.weatherapp.domain.usecase.GetFutureWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

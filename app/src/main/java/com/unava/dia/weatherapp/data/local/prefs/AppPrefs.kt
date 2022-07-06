@@ -1,4 +1,4 @@
-package com.unava.dia.weatherapp.data.local
+package com.unava.dia.weatherapp.data.local.prefs
 
 import android.content.Context
 import androidx.core.content.edit
@@ -29,9 +29,18 @@ class AppPrefs @Inject constructor(
         return sharedPreferences.getString(LAST_CITY_TAG, null) ?: DEFAULT_CITY_NAME
     }
 
+    override fun getId(): Long {
+        return sharedPreferences.getLong(DATA_ID, 0L)
+    }
+
+    override fun setId(id: Long) {
+        return sharedPreferences.edit { putLong(DATA_ID, id) }
+    }
+
     companion object {
         private const val FIRST_RUN_TAG = "first_run"
         private const val LAST_CITY_TAG = "country"
         private const val DEFAULT_CITY_NAME = "London"
+        private const val DATA_ID = "id"
     }
 }
