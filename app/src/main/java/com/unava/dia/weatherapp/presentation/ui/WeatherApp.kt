@@ -27,11 +27,11 @@ fun WeatherApp() {
     Surface(modifier = Modifier.fillMaxSize()) {
         val pagerState = rememberPagerState()
         val tabs = listOf("CURRENT", "FORECAST")
-        var state by remember { mutableStateOf(0) }
+        val state by remember { mutableStateOf(0) }
         val scope = rememberCoroutineScope()
 
         // TAB
-        Column(Modifier.padding(top = 24.dp)) {
+        Column {
             TabRow(selectedTabIndex = state,
                 indicator = {
                     TabRowDefaults.Indicator(

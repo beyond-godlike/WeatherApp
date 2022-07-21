@@ -23,37 +23,40 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.unava.dia.weatherapp.R
 import com.unava.dia.weatherapp.data.model.future.Forecastday
+import com.unava.dia.weatherapp.data.model.future.FutureWeatherResponse
+import com.unava.dia.weatherapp.presentation.ui.MainViewModel
+import com.unava.dia.weatherapp.presentation.ui.State
 import com.unava.dia.weatherapp.presentation.ui.theme.Black
 
 @Composable
 fun MonthScreen(
-    viewModel: MonthViewModel = viewModel(),
+    viewModel: MainViewModel = viewModel(),
     //onBackPressed: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     when (state) {
-        is StateForecast.START -> {
+        is State.START -> {
 
         }
-        is StateForecast.LOADING -> {
+        is State.LOADING -> {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator()
             }
         }
-        is StateForecast.FAILURE -> {
+        is State.FAILURE -> {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                 Text(text = "Something went wrong...", fontSize = 16.sp)
             }
         }
-        is StateForecast.SUCCESS -> {
-            val weather = (state as StateForecast.SUCCESS).weather
+        is State.SUCCESS -> {
+            val weather = (state as State.SUCCESS).weather.responseFuture
             WeatherList(forecastList = weather.forecast?.forecastday!!, viewModel)
         }
     }
 }
 
 @Composable
-fun WeatherList(forecastList: List<Forecastday>, viewModel: MonthViewModel) {
+fun WeatherList(forecastList: List<Forecastday>, viewModel: MainViewModel) {
     LazyRow(modifier = Modifier.padding(0.dp, 26.dp, 0.dp, 0.dp)) {
         itemsIndexed(items = forecastList) { _, item ->
             WeatherCard(

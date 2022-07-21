@@ -1,6 +1,7 @@
 package com.unava.dia.weatherapp.data.remote
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -14,7 +15,6 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Named
 
 @HiltWorker
 class WeatherWorker @AssistedInject constructor(
@@ -43,8 +43,11 @@ class WeatherWorker @AssistedInject constructor(
                 if (response != null) {
                     id = repository.insertCurrentWeather(response)
                     id?.let { shared.setId(it) }
+                    Log.d("w", "done")
+                    Log.d("w", id.toString())
                 }
             } catch (e: Exception) {
+                Log.d("w", e.localizedMessage)
             }
         }
     }

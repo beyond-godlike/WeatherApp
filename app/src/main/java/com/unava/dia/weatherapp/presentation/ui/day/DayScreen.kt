@@ -1,7 +1,6 @@
 package com.unava.dia.weatherapp.presentation.ui.day
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -16,14 +15,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.unava.dia.weatherapp.R
 import com.unava.dia.weatherapp.data.model.current.CurrentWeatherResponse
+import com.unava.dia.weatherapp.presentation.ui.MainViewModel
+import com.unava.dia.weatherapp.presentation.ui.State
 import com.unava.dia.weatherapp.presentation.ui.theme.Black
-import com.unava.dia.weatherapp.presentation.ui.theme.ColorPrimary
 import com.unava.dia.weatherapp.presentation.ui.theme.ColorPrimaryDark
 import com.unava.dia.weatherapp.presentation.ui.theme.Grey
 
 @Composable
 fun DayScreen(
-    viewModel: DayViewModel = viewModel(),
+    viewModel: MainViewModel = viewModel(),
     //onBackPressed: () -> Unit
     //navigateToMonth: (String) -> Unit,
 ) {
@@ -38,21 +38,22 @@ fun DayScreen(
             }
         }
         is State.FAILURE -> {
+            val message = (state as State.FAILURE).message
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                Text(text = "Something went wrong...", fontSize = 16.sp)
+                Text(text = message, fontSize = 16.sp)
             }
             viewModel.city = "London"
             viewModel.saveCity()
         }
         is State.SUCCESS -> {
-            val weather = (state as State.SUCCESS).weather
+            val weather = (state as State.SUCCESS).weather.responseCurrent
             Day(weather, viewModel)
         }
     }
 }
 
 @Composable
-fun Day(weather: CurrentWeatherResponse, viewModel: DayViewModel) {
+fun Day(weather: CurrentWeatherResponse, viewModel: MainViewModel) {
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
@@ -93,7 +94,7 @@ fun LabelCity() {
 }
 
 @Composable
-fun EditTextCity(viewModel: DayViewModel) {
+fun EditTextCity(viewModel: MainViewModel) {
     OutlinedTextField(
         modifier = Modifier
             .padding(8.dp, 26.dp, 8.dp, 8.dp),
@@ -107,7 +108,7 @@ fun EditTextCity(viewModel: DayViewModel) {
 }
 
 @Composable
-fun ButtonOk(viewModel: DayViewModel) {
+fun ButtonOk(viewModel: MainViewModel) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Button(
             onClick = {
